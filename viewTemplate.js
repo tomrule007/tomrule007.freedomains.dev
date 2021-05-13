@@ -1,4 +1,4 @@
-module.export = (town) => `<!DOCTYPE html>
+module.exports.getView = (town) => `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -18,7 +18,9 @@ module.export = (town) => `<!DOCTYPE html>
   <body>
     <h1>You Are visiting from: ${town}</h1>
     <div id="map"></div>
-    
+    <h1>The cities our visitors come from</h1>
+    <ul id="visitorList">
+    </ul>
     <script src="p1.js"></script>
     <script
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB29pGpCzE_JGIEMLu1SGIqwoIbc0sHFHo&callback=initMap"

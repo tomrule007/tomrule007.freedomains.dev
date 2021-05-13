@@ -1,4 +1,4 @@
-const viewTemplate = require('./public/viewTemplate');
+const { getView } = require('./viewTemplate');
 
 const express = require('express');
 const app = express();
@@ -7,7 +7,7 @@ app.use(express.static('public'));
 app.get('/visitor', (req, res) => {
   console.log(req.socket.remoteAddress);
 
-  res.send('Visitor');
+  res.send(getView(req.socket.remoteAddress));
 });
 
 app.get('/api/visitor', (req, res) => {
