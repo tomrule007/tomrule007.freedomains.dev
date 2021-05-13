@@ -9,9 +9,10 @@ app.get('/', (req, res) => {
 });
 
 app.get('/visitor', (req, res) => {
-  console.log(req.socket.remoteAddress);
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  console.log(ip);
 
-  res.send(getView(req.socket.remoteAddress));
+  res.send(getView(ip));
 });
 
 app.get('/api/visitor', (req, res) => {
