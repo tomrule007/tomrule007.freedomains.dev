@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "start": "node --ignore public/* app.js",
+    "dev": "nodemon app.js",
+    "ui": "browser-sync start --proxy localhost:8123 --files=**/*  --ignore=node_modules --reload-delay 10000 --no-ui --no-inject-changes"
   },
   "repository": {
     "type": "git",
@@ -15,6 +17,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "node-fetch": "^2.6.1"
+  },
+  "devDependencies": {
+    "browser-sync": "^2.26.14",
+    "nodemon": "^2.0.7"
   }
 }
