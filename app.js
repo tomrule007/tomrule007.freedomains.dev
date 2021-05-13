@@ -4,6 +4,10 @@ const express = require('express');
 const app = express();
 app.use(express.static('public'));
 
+app.get('/', (req, res) => {
+  res.send('I AM LIVE');
+});
+
 app.get('/visitor', (req, res) => {
   console.log(req.socket.remoteAddress);
 
