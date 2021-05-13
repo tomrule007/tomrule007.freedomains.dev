@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node --ignore public/* app.js",
+    "start": "node app.js",
     "dev": "nodemon app.js",
     "ui": "browser-sync start --proxy localhost:8123 --files=**/*  --ignore=node_modules --reload-delay 10000 --no-ui --no-inject-changes"
   },
