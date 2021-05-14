@@ -58,7 +58,8 @@ app.get('/*', async (req, res, next) => {
 
 app.get('/visitor', (req, res) => {
   console.log('the user', req.user);
-  const town = res.send(getView('test'));
+
+  res.send(getView(req.user.cityStr));
 });
 
 app.get('/api/visitor', (req, res) => {
