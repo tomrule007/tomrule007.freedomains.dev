@@ -1,4 +1,4 @@
-const { getView } = require('./viewTemplate');
+const { getView } = require('./visitorView');
 const fs = require('fs');
 const fetch = require('node-fetch');
 const express = require('express');
@@ -22,14 +22,12 @@ let visitors = JSON.parse(fs.readFileSync(VISITOR_LOG_FILE));
 
 // IP Geo Logger middleware
 app.get('/*', async (req, res, next) => {
-  const ipString =
-    process.env.NODE_ENV === 'development'
-      ? '::ffff:71.93.230.0'
-      : req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  const ip = compose(
+    last,
+    split(':')
+  )(req.headers['x-forwarded-for'] || req.socket.remoteAddress);
 
-  const ip = compose(last, split(':'))(ipString);
-
-  console.log(process.env.NODE_ENV, ipString, ip);
+  console.log(process.env.NODE_ENV, ip);
 
   if (!visitors[ip]) {
     console.log('New Visitor! looking up location');
@@ -67,7 +65,4 @@ app.get('/api/visitor', (req, res) => {
   res.json(visitors);
 });
 
-const port = process.env.PORT || 8123;
-app.listen(port, () => {
-  console.log('Server is running on port: ', port);
-});
+module.exports = { app };
