@@ -27,11 +27,8 @@ app.get('/*', async (req, res, next) => {
     split(':')
   )(req.headers['x-forwarded-for'] || req.socket.remoteAddress);
 
-  console.log(process.env.NODE_ENV, ip);
-
   if (!visitors[ip]) {
-    console.log('New Visitor! looking up location');
-
+    // New Visitor! looking up location
     try {
       const response = await fetch(
         `https://js5.c0d3.com/location/api/ip/${ip}`
