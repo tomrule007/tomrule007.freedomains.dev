@@ -96,7 +96,7 @@ dist
 
 # FuseBox cache
 .fusebox/
-
+vtxhub.com)
 # DynamoDB Local files
 .dynamodb/
 
@@ -105,3 +105,6 @@ dist
 
 # Deploy config file
 deploy.config.js
+
+# Vortex (vtxhub.com)
+.vortex.aes

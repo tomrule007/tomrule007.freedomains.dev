@@ -29,17 +29,18 @@ app.get('/*', async (req, res, next) => {
 
   const ip = compose(last, split(':'))(ipString);
 
+  console.log(process.env.NODE_ENV, ipString, ip);
+
   if (!visitors[ip]) {
     console.log('New Visitor! looking up location');
 
-    // TODO: Add error handling
     try {
       const response = await fetch(
         `https://js5.c0d3.com/location/api/ip/${ip}`
       );
       const { ll, cityStr } = await response.json();
 
-      visitors[ip] = { ip, ll, cityStr };
+      visitors[ip] = { latLng: { lat: ll[0], lng: ll[1] }, cityStr };
     } catch (error) {
       console.log('fetch geo error', error);
     }
@@ -52,18 +53,17 @@ app.get('/*', async (req, res, next) => {
 
   // set user info
   req.user = visitors[ip];
-  console.log(visitors[ip]);
+
   next();
 });
 
 app.get('/visitor', (req, res) => {
   console.log('the user', req.user);
 
-  res.send(getView(req.user.cityStr));
+  res.send(getView(req.user.cityStr, req.user.latLng));
 });
 
 app.get('/api/visitor', (req, res) => {
-  console.log(req);
   res.json(visitors);
 });
 
