@@ -1,4 +1,4 @@
-const { getView } = require('./visitorView');
+const { getVisitorView } = require('./visitorView');
 const fs = require('fs');
 const fetch = require('node-fetch');
 const express = require('express');
@@ -58,7 +58,7 @@ app.get('/*', async (req, res, next) => {
 app.get('/visitor', (req, res) => {
   console.log('the user', req.user);
 
-  res.send(getView(req.user.cityStr, req.user.latLng));
+  res.send(getVisitorView(req.user.cityStr, req.user.latLng));
 });
 
 app.get('/api/visitor', (req, res) => {
