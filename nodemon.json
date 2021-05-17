@@ -1,0 +1,5 @@
+{
+  "events": {
+    "crash": "sh -c 'lsof -i :${PORT:-8123} -t | xargs kill' && npm run dev"
+  }
+}

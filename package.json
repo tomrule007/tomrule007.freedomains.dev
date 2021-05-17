@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest --watch",
     "start": "node start.js",
-    "dev": "NODE_ENV=development nodemon start.js"
+    "dev": "NODE_ENV=development nodemon --delay 600ms start.js"
   },
   "repository": {
     "type": "git",

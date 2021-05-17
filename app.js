@@ -1,9 +1,12 @@
 const { getVisitorView } = require('./visitorView');
 const fs = require('fs');
 const fetch = require('node-fetch');
+const { spawn } = require('child_process');
+const path = require('path');
 const express = require('express');
 const app = express();
 app.use(express.static('public'));
+app.use(express.json());
 
 // constants
 const VISITOR_LOG_FILE = './visitorLog';
@@ -61,5 +64,66 @@ app.get('/visitor', (req, res) => {
 app.get('/api/visitor', (req, res) => {
   res.json(visitors);
 });
+
+// JS5 -  Problem 2
+
+app.get('/commands', (req, res) => {
+  res.sendFile(path.join(__dirname, '/public/commands.html'));
+});
+
+app.post('/commands', async (req, res) => {
+  // parse input
+  const { stdin } = req.body;
+
+  // TODO: add support for quoted param values
+  const [cmd, ...params] = stdin.split(' ');
+
+  const output = await runCommand(cmd, params);
+
+  res.json({ ...output, stdin });
+});
+
+function runCommand(cmd, params) {
+  const output = {
+    stdout: null,
+    stderr: null,
+    exitCode: null,
+  };
+
+  // Check command is one of these three commands
+  const VALID_COMMANDS = ['ls', 'pwd', 'cat'];
+  if (!VALID_COMMANDS.includes(cmd)) {
+    // Fake output on not allowed commands
+    output.stdout = `bash: ${cmd}: command not found`;
+    output.exitCode = 1;
+
+    return output;
+  }
+
+  const cmdProcess = spawn(cmd, params);
+
+  cmdProcess.stdout.on('data', (data) => {
+    output.stdout = data.toString();
+  });
+
+  cmdProcess.stderr.on('data', (data) => {
+    output.stderr = data.toString();
+  });
+
+  // wait for exit code to return results
+  return new Promise((resolve, reject) => {
+    cmdProcess.on('close', (code) => {
+      output.exitCode = code;
+      resolve(output);
+    });
+    // TODO: this timeout should be a reject! with error handling on the other side
+    setTimeout(() => {
+      cmdProcess.kill();
+      output.stderr =
+        'Command timed out!!\n Make sure not to send an open ended command like "cat" with no params\n';
+      resolve(output);
+    }, 2000);
+  });
+}
 
 module.exports = { app };
