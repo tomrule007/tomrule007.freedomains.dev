@@ -121,6 +121,5 @@ module.exports = {
   startServer,
   stopServer,
   logAndThrowErrors,
-  flushPromises,
   LRUCache,
 };
