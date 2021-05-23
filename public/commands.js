@@ -33,5 +33,3 @@ function renderTerminalOutput({ stdout, stderr, exitCode }) {
 
   $stdout.scrollTop = $stdout.scrollHeight; // - div.clientHeight;
 }
-
-console.log('script loaded');

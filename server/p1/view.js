@@ -1,4 +1,4 @@
-module.exports.getVisitorView = (town, latLng) => `<!DOCTYPE html>
+module.exports = ({ town, latLng } = {}) => `<!DOCTYPE html>
   <html lang="en">
     <head>
       <meta charset="UTF-8" />

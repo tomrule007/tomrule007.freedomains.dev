@@ -1,3 +1,11 @@
+const compose =
+  (...fns) =>
+  (x) =>
+    fns.reduceRight((x, y) => y(x), x);
+
+const last = (a) => a[a.length - 1];
+const split = (separator) => (string) => string.split(separator);
+
 // Start & Stop server functions for test runner
 const startServer = (app, port = 3000) =>
   new Promise((resolve, reject) => {
@@ -27,6 +35,16 @@ const stopServer = (server, port) =>
       reject(error);
     }
   });
+
+const logAndThrowErrors = async (response, fileName) => {
+  if (response.ok) return;
+
+  const testFile = require('path').basename(fileName);
+  const logFile = './errorLog-' + testFile + '.html';
+
+  await fs.writeFile(logFile, await response.text());
+  throw Error(`ERROR FILE LOGGED: ${logFile}`);
+};
 
 /** Class LRU Cache (Lease Recent Used)*/
 class LRUCache {
@@ -96,4 +114,13 @@ class LRUCache {
   }
 }
 
-module.exports = { startServer, stopServer, LRUCache };
+module.exports = {
+  compose,
+  split,
+  last,
+  startServer,
+  stopServer,
+  logAndThrowErrors,
+  flushPromises,
+  LRUCache,
+};

@@ -1,5 +1,14 @@
 {
+  "verbose": false,
+  "watch": ["start.js", "server/app.js"],
+  "ext": "js",
+  "env": {
+    "NODE_ENV": "development",
+    "PORT": 1337,
+    "PROXY_PORT": 3000
+  },
+  "delay": 600,
   "events": {
-    "crash": "sh -c 'lsof -i :${PORT:-8123} -t | xargs kill' && npm run dev"
+    "crash": "echo \"Force Kill Server port: ${PORT:-8123}\" && sh -c 'lsof -i :${PORT:-8123} -t | xargs -r kill' && echo \"Force Kill Proxy port: ${PROXY_PORT:-3000}\" &&  sh -c 'lsof -i :${PROXY_PORT:-3000} -t | xargs -r kill' && echo \".... And try again :)\" && npm run dev"
   }
 }
