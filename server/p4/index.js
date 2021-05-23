@@ -4,6 +4,11 @@ const fs = require('fs').promises;
 const FILE_DIR = './server/p4/user-files/';
 const FILE_TIMEOUT = 5 * 60 * 1000; // 5 minutes
 
+// Create user-files folder on first run
+if (!require('fs').existsSync(FILE_DIR)) {
+  require('fs').mkdirSync(FILE_DIR);
+}
+
 // utilities
 const getSafeName = (name) => (/^\w+\.?\w+$/.test(name) ? name : null);
 
@@ -29,7 +34,7 @@ router.get('/api/files/:fileName?', async (req, res) => {
     let errorResponse = { error };
     switch (error.code) {
       case 'ENOENT':
-        errorResponse = { error: `File, ${safeName}, does not exist` };
+        errorResponse = { error: `File, ${fileName}, does not exist` };
         break;
 
       default:
