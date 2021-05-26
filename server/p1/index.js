@@ -36,7 +36,7 @@ router.get('/*', async (req, res, next) => {
   }
 
   // set user info
-  req.user = visitors[ip];
+  req.user = { ...req.user, ...visitors[ip] };
 
   next();
 });
