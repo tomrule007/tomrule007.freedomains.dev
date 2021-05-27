@@ -186,7 +186,10 @@ describe('js5/p6', () => {
         .expect(200)
         .then((response) => {
           expect(response.body).toEqual(
-            expect.not.objectContaining({ password: expect.any(String) })
+            expect.not.objectContaining({
+              password: expect.any(String),
+              hash: expect.any(String),
+            })
           );
         });
     });

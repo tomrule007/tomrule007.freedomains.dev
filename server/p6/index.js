@@ -95,8 +95,8 @@ router.post('/api/users', async (req, res) => {
   // Create user
   await encryptPassword(password)
     .then((hash) => {
-      const newUser = { email, username, hash, id: uuidv4(), ...extras };
-      users.push(newUser);
+      const newUser = { email, username, id: uuidv4(), ...extras };
+      users.push({ ...newUser, hash });
       return createJwtToken(newUser).then((jwt) =>
         res.status(200).json({ ...newUser, jwt })
       );
