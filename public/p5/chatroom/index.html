@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        display: flex;
+        height: 100vh;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+      }
+      .chatroom {
+        width: 100%;
+        overflow: auto;
+      }
+      .chatroom-input-container {
+        display: flex;
+        align-items: center;
+        width: 100%;
+      }
+      .chatroom-input-text {
+        flex-grow: 1;
+      }
+      .chat-msg {
+        display: flex;
+        flex-direction: row;
+        margin: 5px;
+      }
+      .error-msg {
+        color: red;
+      }
+
+      .app-container {
+        padding: 5px;
+        border-radius: 5px;
+        border: lightgray solid 2px;
+        background-color: lightgoldenrodyellow;
+        max-height: 90vh;
+        min-width: max(50%, 500px);
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app-container"></main>
+
+    <script src="/p5/chatroom/chatroom.js"></script>
+  </body>
+</html>

@@ -30,6 +30,7 @@ const sendUnsafeRoomErrorResponse = (res, room) => {
 
 // Check credentials on all requests
 router.use(async (req, res, next) => {
+  console.log('all routes');
   try {
     //Forward request to 3rd party auth
     const authResponse = await fetch('https://js5.c0d3.com/auth/api/session', {

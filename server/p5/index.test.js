@@ -29,12 +29,12 @@ describe('js5/p5', () => {
   });
 
   // END POINT TESTS
-  describe('GET /api/session', () => {
+  describe('GET /p5/api/session', () => {
     beforeEach(() => {
       jest.clearAllMocks();
     });
     it('returns status 403 and error message on invalid/missing auth', async () => {
-      const response = await fetch(`http://localhost:${port}/api/session`, {
+      const response = await fetch(`http://localhost:${port}/p5/api/session`, {
         headers: {
           Authorization: 'Bearer Invalid',
         },
@@ -58,11 +58,14 @@ describe('js5/p5', () => {
       fetch.mockImplementationOnce(() => mockResponse);
 
       // Send real Fetch to server
-      const response = await realFetch(`http://localhost:${port}/api/session`, {
-        headers: {
-          authorization: `Bearer ${mockJWT}`,
-        },
-      });
+      const response = await realFetch(
+        `http://localhost:${port}/p5/api/session`,
+        {
+          headers: {
+            authorization: `Bearer ${mockJWT}`,
+          },
+        }
+      );
 
       // Expect server to call 3rd party auth server one time.
       expect(fetch).toHaveBeenCalledWith(
