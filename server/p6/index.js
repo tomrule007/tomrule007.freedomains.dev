@@ -147,6 +147,8 @@ router.post('/api/sessions', async (req, res) => {
 
 router.get('/api/sessions', async (req, res) => {
   const jwt = (req.headers.authorization || '').split(' ').pop();
+  if (!jwt)
+    return res.status(400).json({ error: { message: 'Not logged in' } });
 
   const expireTime = Math.floor(Date.now() / 1000) - 60 * 60; // Token expires after 1hr
   await verifyJwtToken(jwt)
