@@ -50,6 +50,8 @@ const users = process.env.NODE_ENV === 'test' ? [VALID_MOCK_USER] : [];
 const isUniqueUsername = (username) =>
   !users.some((user) => user.username === username);
 
+const isUniqueEmail = (email) => !users.some((user) => user.email === email);
+
 const getUserByKeyValue = (keyValue) =>
   users.find((user) => {
     const [[key, value]] = Object.entries(keyValue);
@@ -68,7 +70,7 @@ router.post('/api/users', async (req, res) => {
       },
     });
 
-  const alphaNumericOnly = /^[a-z09]+$/i;
+  const alphaNumericOnly = /^[a-z0-9]+$/i;
   if (!username || !alphaNumericOnly.test(username))
     return res.status(400).json({
       error: {
@@ -92,6 +94,12 @@ router.post('/api/users', async (req, res) => {
       },
     });
 
+  if (!isUniqueEmail(email))
+    return res.status(400).json({
+      error: {
+        message: 'Email is already registered',
+      },
+    });
   // Create user
   await encryptPassword(password)
     .then((hash) => {

@@ -57,7 +57,7 @@ describe('js5/p6', () => {
         [{}, badUsername, 'error w/ password'],
         [{ username: '-bad-' }, badUsername, 'error w/ password'],
         [{ username: 'goodOne' }, goodUsername, 'Not username error'],
-        [{ username: 'greatOne' }, goodUsername, 'Not username error'],
+        [{ username: 'greatOne2' }, goodUsername, 'Not username error'],
       ])('Input: %s -> %s  ( %s )', async (input, output) => {
         await request(app)
           .post('/p6/api/users')
