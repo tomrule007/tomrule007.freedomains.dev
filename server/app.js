@@ -22,5 +22,7 @@ app.use('/p5', (req, res, next) => {
 app.use('/p6', (req, res, next) => {
   require('./p6')(req, res, next);
 });
-
+app.use('/p7', (req, res, next) => {
+  require('./p7')(req, res, next);
+});
 module.exports = app;

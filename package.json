@@ -3,6 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "main": "start.js",
+  "jest": {
+    "verbose": true,
+    "watchPathIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/package*.json"
+    ]
+  },
   "scripts": {
     "test": "jest --watch",
     "start": "node start.js",
@@ -20,7 +27,9 @@
     "express": "^4.17.1",
     "jimp": "^0.16.1",
     "jsonwebtoken": "^8.5.1",
+    "multer": "^1.4.2",
     "node-fetch": "^2.6.1",
+    "tesseract.js": "^2.1.4",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Text Extraction</title>
+  </head>
+  <body>
+    <h1>test</h1>
+    <form
+      id="fileDropForm"
+      action="/p7/files"
+      enctype="multipart/form-data"
+      method="post"
+    >
+      <input type="file" name="userFiles" />
+
+      <input type="submit" value="Send!" class="btn btn-default" />
+    </form>
+    <div class="output">
+      <div class="jobURL"></div>
+    </div>
+    <div class="error"></div>
+    <script>
+      const $form = document.querySelector('#fileDropForm');
+      const $jobURL = document.querySelector('.jobURL');
+      const $output = document.querySelector('.output');
+      const $error = document.querySelector('.error');
+      $form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        fetch(event.target.action, {
+          method: 'POST',
+          body: new FormData(event.target),
+        })
+          .then((r) => r.json())
+          .then((body) => {
+            if (body.error) return Promise.reject(body);
+            pollJobStatus(body, renderUpdate);
+          })
+          .catch((error) => {
+            // Not that clear, but returns last non undefined value
+            $error.innerText = error && error.error && error.error.message;
+          });
+      });
+
+      function renderUpdate(data) {
+        console.log('RENDER_DATA', data);
+        const renderImageStatus = (imageData, index) => `
+          <div>
+            <h3>Image (${index})</h3>
+            <p>
+              ${imageData.status ? `Status: ${imageData.status} <br>` : ''}
+              ${
+                imageData.progress ? `Progress: ${imageData.progress} <br>` : ''
+              }
+            </p>
+
+            <p>${imageData.text ? `Text: ${imageData.text}` : ''}</p>
+          </div>
+        `;
+
+        $output.innerHTML = Object.values(data)
+          .map(renderImageStatus)
+          .join('\n');
+      }
+
+      const elapsedSecondsFrom = (startEpoch) =>
+        Math.floor((Date.now() - startEpoch) / 1000);
+
+      function pollJobStatus(
+        jobId,
+        updateCallback,
+        interval = 2,
+        timeout = 40,
+        start = Date.now(),
+        previousState = null
+      ) {
+        fetch(`/p7/api/job/${jobId}`)
+          .then((r) => r.json())
+          .then((data) => {
+            const dataString = JSON.stringify(data);
+
+            if (dataString !== previousState) updateCallback(data);
+
+            const dataArray = Object.values(data);
+            const allDone =
+              dataArray.length && dataArray.every(({ text }) => text);
+
+            if (elapsedSecondsFrom(start) > timeout || allDone) {
+              console.log(allDone ? 'ALL_DONE' : 'TIMED_OUT');
+              return;
+            }
+
+            setTimeout(() => {
+              pollJobStatus(
+                jobId,
+                updateCallback,
+                interval,
+                timeout,
+                start,
+                dataString
+              );
+            }, interval * 1000);
+          });
+      }
+    </script>
+  </body>
+</html>
