@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Selfie Queen</title>
+    <style>
+      body {
+        margin: 0;
+      }
+      .snapshot,
+      .video-display,
+      .selfie {
+        width: min(100%, 640px);
+        height: 100%;
+      }
+      .snapshot-button,
+      .share-button {
+        width: 5em;
+        margin: 0.5em;
+        padding: 0.5em 1em;
+        font-size: 30px;
+        border-radius: 1em;
+        flex-shrink: 0;
+      }
+      .photo-booth {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+      }
+      .selfie-gallery {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: left;
+        overflow-y: auto;
+        margin: 0;
+      }
+      h1,
+      h2,
+      div {
+        margin: 1em;
+        text-align: center;
+      }
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Selfie Queen</h1>
+    <div class="photo-booth">
+      <div>
+        <video class="video-display" width="640px" height="480px"></video>
+        <br />
+        <button class="snapshot-button" alt="Take snapshot" disabled="true">
+          📷
+        </button>
+      </div>
+      <div class="snapshot-container hidden">
+        <canvas class="snapshot" width="640px" height="480px"></canvas>
+        <br />
+        <button class="share-button" alt="Share snapshot">Share</button>
+      </div>
+    </div>
+    <h2>User Selfies</h2>
+    <div class="selfie-gallery"></div>
+    <script>
+      // DOM refs
+      const $video = document.querySelector('.video-display');
+      const $photoButton = document.querySelector('.snapshot-button');
+      const $snapshotContainer = document.querySelector('.snapshot-container');
+      const $shareButton = document.querySelector('.share-button');
+      const $snapshot = document.querySelector('.snapshot');
+      const $selfieGallery = document.querySelector('.selfie-gallery');
+      const context = $snapshot.getContext('2d');
+
+      // Webcam Setup
+      navigator.mediaDevices
+        .getUserMedia({
+          audio: false,
+          video: true,
+        })
+        .then((stream) => {
+          $video.srcObject = stream;
+          $video.play();
+          $photoButton.disabled = false;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
+      // View Renders
+      const renderSelfie = (url) => {
+        const $selfieContainer = document.createElement('div');
+        $selfieContainer.innerHTML = `
+          <img class="selfie" src= "${url}"/>
+          <a class="selfie-link" href="${url}"> ${url}</a>
+          `;
+        $selfieContainer.classList.add('selfie-container');
+
+        renderedUrls.add(url);
+
+        return $selfieContainer;
+      };
+
+      const renderedUrls = new Set();
+      const renderNewPhotos = (urls) => {
+        const newUrls = urls.filter((url) => !renderedUrls.has(url));
+
+        const selfies = newUrls.map(renderSelfie);
+
+        $selfieGallery.prepend(...selfies.reverse());
+      };
+
+      const fetchAndRenderSelfies = () => {
+        fetch('/p8/api/selfie')
+          .then((r) => r.json())
+          .then((body) => {
+            if (body.error) throw body.error;
+            if (!body.links) throw Error('NO LINKS');
+            renderNewPhotos(body.links);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      };
+
+      // Initial gallery fetch
+      fetchAndRenderSelfies();
+
+      // Event Listeners & Polling
+      $photoButton.addEventListener('click', (e) => {
+        context.drawImage($video, 0, 0, 640, 480);
+        $snapshotContainer.classList.remove('hidden');
+      });
+
+      $shareButton.addEventListener('click', () => {
+        const imageData = $snapshot.toDataURL().split(',')[1]; // remove meta data
+        fetch('/p8/api/selfie', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ selfie: imageData }),
+        })
+          .then((r) => r.json())
+          .then((body) => {
+            if (body.error) throw body.error;
+
+            fetchAndRenderSelfies();
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
+
+      //Poll server for new images 30seconds
+      setInterval(() => {
+        fetchAndRenderSelfies();
+      }, 1000 * 30);
+    </script>
+  </body>
+</html>
