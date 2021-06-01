@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Meme Chat</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin: 0;
+      }
+      .snapshot,
+      .video-display,
+      .selfie {
+        width: min(100%, 640px);
+        height: 100%;
+      }
+      .video-container {
+        border: 1em solid black;
+        padding: 1em;
+        background-color: black;
+        border-radius: 1em;
+      }
+      .video-display {
+        border: 2px solid white;
+      }
+
+      .snapshot-button,
+      .share-button {
+        width: 5em;
+        margin: 0.5em;
+        padding: 0.5em 1em;
+        font-size: 30px;
+        border-radius: 1em;
+        flex-shrink: 0;
+      }
+      .button {
+        border: none;
+      }
+
+      button:active {
+        background: #b6b6b6;
+        -webkit-box-shadow: inset 0px 0px 5px #c1c1c1;
+        -moz-box-shadow: inset 0px 0px 5px #c1c1c1;
+        box-shadow: inset 0px 0px 5px #c1c1c1;
+        outline: none;
+      }
+      .username-container,
+      .photo-booth {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+      }
+      .meme-gallery {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        overflow-y: auto;
+        margin: 0;
+      }
+      h1,
+      h2,
+      div {
+        margin: 1em;
+        text-align: center;
+      }
+      .hidden {
+        display: none;
+      }
+      .meme-container {
+        padding: 1em;
+        position: relative;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+          0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        font-family: 'Architects Daughter', cursive;
+      }
+      .close-button {
+        position: absolute;
+        top: 1em;
+        right: 1em;
+        width: 1.5em;
+        height: 1.5em;
+        font-size: 30px;
+        border-radius: 1em;
+      }
+      .meme-input {
+        /* border-radius: 1em; */
+        box-sizing: border-box;
+        width: 100%;
+      }
+      .login-error {
+        color: red;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Meme Chat</h1>
+    <div class="login-container hidden">
+      <h2>Login to share a meme!</h2>
+      <label>Username: <input class="username-input" type="text" /> </label>
+      <div class="login-error"></div>
+      <button class="button login-button">Login</button>
+    </div>
+    <div class="username-container hidden">
+      <h2>Hello <span class="username-display">Tomrule007</span></h2>
+      <button class="button logout-button">logout</button>
+    </div>
+    <div class="photo-booth hidden">
+      <div class="video-container">
+        <video class="video-display" width="640px" height="480px"></video>
+        <br />
+        <button
+          class="snapshot-button button"
+          alt="Take snapshot"
+          disabled="true"
+        >
+          📷
+        </button>
+      </div>
+      <div class="meme-container hidden">
+        <canvas class="snapshot" width="640px" height="480px"></canvas>
+        <button title="Close" class="close-button button">X</button>
+        <br />
+        <label
+          >Meme<input type="text" placeholder="Meme input" class="meme-input"
+        /></label>
+        <br />
+        <button class="share-button button" alt="Share snapshot">Share</button>
+      </div>
+    </div>
+    <div class="app"></div>
+    <h2>User Memes</h2>
+    <div class="meme-gallery galleryA"></div>
+    <div class="meme-gallery galleryB hidden"></div>
+
+    <script>
+      // Login
+      const $loginContainer = document.querySelector('.login-container');
+      const $usernameInput = document.querySelector('.username-input');
+      const $loginError = document.querySelector('.login-error');
+      const $loginButton = document.querySelector('.login-button');
+
+      const showLogin = (error = '') => {
+        $loginError.innerText = error;
+        $loginContainer.classList.remove('hidden');
+      };
+
+      const hideLogin = () => {
+        $loginError.innerText = '';
+        $loginContainer.classList.add('hidden');
+      };
+
+      // Photo booth
+      const $usernameContainer = document.querySelector('.username-container');
+      const $usernameDisplay = document.querySelector('.username-display');
+      const $logoutButton = document.querySelector('.logout-button');
+
+      const $photoBooth = document.querySelector('.photo-booth');
+      const $videoContainer = document.querySelector('.video-container');
+      const $video = document.querySelector('.video-display');
+      const $photoButton = document.querySelector('.snapshot-button');
+
+      // enable webcam
+      navigator.mediaDevices
+        .getUserMedia({
+          audio: false,
+          video: true,
+        })
+        .then((stream) => {
+          $video.srcObject = stream;
+          $video.play();
+          $photoButton.disabled = false;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
+      const showPhotoBooth = (username) => {
+        $usernameDisplay.innerText = username;
+        $usernameContainer.classList.remove('hidden');
+        $photoBooth.classList.remove('hidden');
+      };
+
+      const hidePhotoBooth = () => {
+        $usernameDisplay.innerText = '';
+        $usernameContainer.classList.add('hidden');
+        $photoBooth.classList.add('hidden');
+      };
+
+      // Meme share
+      const $snapshotContainer = document.querySelector('.meme-container');
+      const $closeButton = document.querySelector('.close-button');
+      const $snapshot = document.querySelector('.snapshot');
+      const $memeInput = document.querySelector('.meme-input');
+      const $shareButton = document.querySelector('.share-button');
+
+      //  Gallery
+      const gallery = {
+        current: document.querySelector('.galleryA'),
+        next: document.querySelector('.galleryB'),
+        toggle: function () {
+          const oldCurrent = this.current;
+          this.current = this.next;
+          this.next = oldCurrent;
+          this.current.classList.toggle('hidden');
+          this.next.classList.toggle('hidden');
+        },
+      };
+
+      const createMeme = ({ url, username }) => {
+        const $memeContainer = document.createElement('div');
+        $memeContainer.classList.add('meme-container');
+
+        const $meme = document.createElement('img');
+        $meme.src = url;
+
+        const $username = document.createElement('h2');
+        $username.innerText = username;
+
+        $memeContainer.append($meme, $username);
+
+        return {
+          node: $memeContainer,
+          complete: new Promise((resolve, reject) => {
+            if ($meme.complete) resolve();
+            $meme.addEventListener('load', resolve);
+            $meme.addEventListener('error', reject);
+          }),
+        };
+      };
+
+      const fetchAndRenderMemes = () => {
+        fetch('/p9/api/meme', { credentials: 'same-origin' })
+          .then((r) => r.json())
+          .then((body) => {
+            if (body.error) throw body.error;
+            if (!body.memes) throw Error('NO MEMES');
+
+            const memes = body.memes.map(createMeme);
+            gallery.next.replaceChildren(...memes.map(({ node }) => node));
+
+            return Promise.all(memes.map(({ complete }) => complete));
+          })
+          .then(() => gallery.toggle())
+          .catch((err) => {
+            console.log(err);
+          });
+      };
+
+      // Load login of photo booth
+      fetch('/p9/api/user', { method: 'GET', credentials: 'same-origin' })
+        .then((r) => r.json())
+        .then((body) => {
+          if (body.error) throw body.error;
+          console.log();
+          showPhotoBooth(body.username);
+        })
+        .catch((err) => {
+          //TODO: add some error handling
+          showLogin();
+        });
+
+      // Load meme gallery
+      fetchAndRenderMemes();
+
+      // Poll new memes every 30seconds
+      setInterval(() => {
+        fetchAndRenderMemes();
+      }, 1000 * 30);
+
+      // Event Listeners
+      $loginButton.addEventListener('click', (e) => {
+        const username = $usernameInput.value;
+        fetch('/p9/api/user', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username }),
+        })
+          .then((r) => r.json())
+          .then((body) => {
+            if (body.error) throw body.error;
+            console.log('We all good');
+            showPhotoBooth(username);
+            console.log('We all good2');
+            hideLogin();
+            console.log('We all good3');
+          })
+          .catch((err) => {
+            showLogin(err?.message ?? 'Unknown Server Error');
+            hidePhotoBooth();
+          });
+      });
+
+      $logoutButton.addEventListener('click', (e) => {
+        showLogin();
+        hidePhotoBooth();
+      });
+
+      $closeButton.addEventListener('click', (e) => {
+        $videoContainer.classList.remove('hidden');
+        $snapshotContainer.classList.add('hidden');
+      });
+
+      $photoButton.addEventListener('click', (e) => {
+        $snapshot.getContext('2d').drawImage($video, 0, 0, 640, 480);
+        $snapshotContainer.classList.remove('hidden');
+        $videoContainer.classList.add('hidden');
+      });
+
+      $shareButton.addEventListener('click', () => {
+        const imageData = $snapshot.toDataURL().split(',')[1]; // remove meta data
+        const meme = $memeInput.value;
+        fetch('/p9/api/meme', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ selfie: imageData, meme }),
+        })
+          .then((r) => r.json())
+          .then((body) => {
+            if (body.error) throw body.error;
+            fetchAndRenderMemes();
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
+    </script>
+  </body>
+</html>
