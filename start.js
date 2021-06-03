@@ -1,20 +1,47 @@
 const app = require('./server/app.js');
+const { PokemonAPI } = require('./pokemon-api');
 
 const port = process.env.PORT || 8123;
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+
+const { ApolloServer } = require('apollo-server-express');
+const { typeDefs, resolvers } = require('./schema');
+
+async function startApolloServer(app) {
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    dataSources: () => ({
+      pokemonAPI: new PokemonAPI(),
+    }),
+  });
+  await server.start();
+
+  server.applyMiddleware({ app });
+
+  console.log(`🚀 GraphQL endpoint: ${server.graphqlPath}`);
+
+  return app;
+}
+
+startApolloServer(app).then((app) => {
+  app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+  });
 });
 
 if (process.env.NODE_ENV === 'development') {
   // Browsersync proxy
   const bs = require('browser-sync').create();
-  bs.init({
-    open: false,
-    port: process.env.PROXY_PORT || 3000,
-    proxy: `http://localhost:${port}`,
-    notify: false,
-    ws: true,
-  });
+  bs.init(
+    {
+      open: false,
+      port: process.env.PROXY_PORT || 3000,
+      proxy: `http://localhost:${port}`,
+      notify: false,
+      ws: true,
+    },
+    () => bs.reload() // Force refresh on first boot
+  );
 
   // File Watcher
   const chokidar = require('chokidar');

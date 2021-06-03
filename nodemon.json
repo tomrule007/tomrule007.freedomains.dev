@@ -1,6 +1,6 @@
 {
   "verbose": false,
-  "watch": ["start.js", "server/app.js"],
+  "watch": ["./*.js", "server/app.js"],
   "ext": "js",
   "env": {
     "NODE_ENV": "development",
