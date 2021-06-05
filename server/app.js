@@ -2,6 +2,11 @@ const express = require('express');
 const app = express();
 app.use(express.static('public'));
 app.use(express.json({ limit: '5mb' }));
+const session = require('express-session');
+//TODO: setup real production ready session store (default is a leaky in memory store)
+app.use(
+  session({ secret: 'sneakyCookie', resave: false, saveUninitialized: false })
+);
 
 // *Must require statements must remain wrapped in arrow function to insure files get reloaded
 app.use((req, res, next) => {

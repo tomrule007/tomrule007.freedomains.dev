@@ -15,7 +15,7 @@ const startServer = (app, port = 3000) =>
         resolve([server, port]);
       })
       .on('error', (err) => {
-        if (err.errno === 'EADDRINUSE') {
+        if (err.code === 'EADDRINUSE') {
           port += 1;
           server.listen(port);
         } else {

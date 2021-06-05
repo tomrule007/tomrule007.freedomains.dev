@@ -1,8 +1,10 @@
 const app = require('./server/app.js');
 const { PokemonAPI } = require('./pokemon-api');
+const { LessonsAPI } = require('./lessons-api');
 
 const port = process.env.PORT || 8123;
 
+const responseCachePlugin = require('apollo-server-plugin-response-cache');
 const { ApolloServer } = require('apollo-server-express');
 const { typeDefs, resolvers } = require('./schema');
 
@@ -10,9 +12,12 @@ async function startApolloServer(app) {
   const server = new ApolloServer({
     typeDefs,
     resolvers,
+    context: ({ req }) => ({ req }),
     dataSources: () => ({
+      lessonsAPI: new LessonsAPI(),
       pokemonAPI: new PokemonAPI(),
     }),
+    plugins: [responseCachePlugin()],
   });
   await server.start();
 
@@ -30,7 +35,7 @@ startApolloServer(app).then((app) => {
 });
 
 if (process.env.NODE_ENV === 'development') {
-  // Browsersync proxy
+  // BrowserSync proxy
   const bs = require('browser-sync').create();
   bs.init(
     {
