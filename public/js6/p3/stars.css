@@ -1,0 +1,15 @@
+.fa-star {
+  font-size: 2em;
+}
+.fas {
+  color: yellow;
+  -webkit-text-stroke-width: 3px;
+  -webkit-text-stroke-color: black;
+}
+.stars {
+  padding-top: 1em;
+  display: inline-block;
+}
+.starsText {
+  margin-top: 1em;
+}

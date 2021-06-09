@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const app = express();
 app.use(express.static('public'));
@@ -35,5 +36,9 @@ app.use('/p8', (req, res, next) => {
 });
 app.use('/p9', (req, res, next) => {
   require('./p9')(req, res, next);
+});
+
+app.get('/js6/p3/*', (req, res, next) => {
+  res.sendFile(path.join(__dirname, '../public/js6/p3/index.html'));
 });
 module.exports = app;

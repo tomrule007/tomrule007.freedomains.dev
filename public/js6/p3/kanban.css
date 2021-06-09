@@ -1,0 +1,68 @@
+body {
+  margin: 0px;
+}
+.undo-button {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  padding: 20px;
+}
+.board {
+  display: flex;
+  padding: 15px;
+}
+.board-column {
+  flex-basis: 25%;
+  min-width: 150px;
+  margin: 15px;
+  height: 100px;
+}
+.board-column:first-child .button-left {
+  visibility: hidden;
+}
+.board-column:last-child .button-right {
+  visibility: hidden;
+}
+.column-title {
+  color: white;
+  text-align: center;
+  font-size: 1em;
+  padding: 10px;
+  margin: 0;
+}
+.button-left {
+  margin: 10px;
+  cursor: pointer;
+}
+.task-text {
+  flex-grow: 1;
+  margin: 10px 0;
+  cursor: pointer;
+}
+.task-container {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  background-color: #eee;
+  margin-bottom: 5px;
+}
+.task-container:last-child {
+  margin-bottom: 0;
+}
+.button-right {
+  margin: 10px;
+  cursor: pointer;
+  flex-grow: 0;
+  flex-basis: auto;
+  align-items: center;
+}
+.textarea {
+  display: inline-block;
+  text-align: left;
+  flex-basis: 100%;
+  flex-grow: 1;
+}
+.task-form-container {
+  display: flex;
+  width: 100%;
+}
