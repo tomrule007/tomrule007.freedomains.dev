@@ -12,8 +12,7 @@
   },
   "scripts": {
     "test": "jest --watch",
-    "start": "node start.js",
-    "start:myproxy": "webpack && node start.js",
+    "start": "webpack && node start.js",
     "build": "webpack",
     "build:watch": "webpack --watch",
     "dev": "nodemon --config nodemon.json"
