@@ -37,10 +37,7 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    lessons: (_, __, { dataSources }) => {
-      console.log('FETCHING THE LESSONS');
-      return dataSources.lessonsAPI.getLessons();
-    },
+    lessons: (_, __, { dataSources }) => dataSources.lessonsAPI.getLessons(),
     search: async (_, { str }, { dataSources }) => {
       const allBasicPokemon = await dataSources.pokemonAPI.getAllBasicPokemon();
       return allBasicPokemon.filter((pokemon) => pokemon.name.includes(str));

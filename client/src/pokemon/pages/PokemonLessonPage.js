@@ -18,7 +18,7 @@ const PokemonLoggedInPage = () => {
       setLoading(false);
     });
   }, []);
-  console.log({ user, lessons, loading });
+
   const unenrolledLessons =
     !loading &&
     lessons.filter(

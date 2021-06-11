@@ -165,7 +165,7 @@
           acc[lesson.title] = { enrolled: false };
           return acc;
         }, {});
-        console.log(lessonMap);
+
         const userLessons = userInfo.lessons || [];
         userLessons.forEach((lesson) => {
           lessonMap[lesson.title].enrolled = true;

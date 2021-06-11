@@ -28,7 +28,6 @@ function Pokemon() {
 
   const handleLogin = (name) => {
     sendQuery(`mutation {login (pokemon: "${name}") {name}}`).then((result) => {
-      console.log({ result });
       if (result?.login?.name) setLoggedIn(true);
     });
   };

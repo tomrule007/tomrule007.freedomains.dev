@@ -4,7 +4,6 @@ const simpleCache = {
   lastSet: null,
   maxAge: 60 * 60 * 1000, // 1hour in ms
   get: function () {
-    console.log({ current: Date.now() });
     return this.lastSet + this.maxAge > Date.now() ? this.store : null;
   },
   set: function (value) {
@@ -23,7 +22,6 @@ class LessonsAPI extends RESTDataSource {
 
   async getLessons() {
     const cachedResults = simpleCache.get();
-    console.log({ cachedResults, time: simpleCache.lastSet });
     if (cachedResults) return cachedResults;
 
     try {
@@ -33,7 +31,6 @@ class LessonsAPI extends RESTDataSource {
         : [];
 
       simpleCache.set(lessons);
-      console.log({ lessons });
       return lessons;
     } catch (error) {
       console.log({ error });
