@@ -3,9 +3,15 @@ const fetch = require('node-fetch');
 
 const typeDefs = gql`
   type User {
-    name: String
-    image: String
-    lessons: [Lesson]
+    name: String!
+    image: String!
+    lessons: [Lesson!]!
+    ratings: [Rating!]!
+  }
+
+  type Rating {
+    title: String!
+    rating: Int!
   }
 
   type Lesson @cacheControl(maxAge: 3600) {
@@ -22,8 +28,8 @@ const typeDefs = gql`
   }
 
   type Query {
-    lessons: [Lesson]
-    search(str: String!): [BasicPokemon]
+    lessons: [Lesson!]!
+    search(str: String!): [BasicPokemon!]!
     getPokemon(str: String!): Pokemon
     user: User
   }
@@ -32,8 +38,11 @@ const typeDefs = gql`
     login(pokemon: String!): User
     enroll(title: String!): User
     unenroll(title: String!): User
+    rateLesson(title: String!, rating: Int!): User
   }
 `;
+
+const lessonRatingsByUser = {};
 
 const resolvers = {
   Query: {
@@ -49,7 +58,12 @@ const resolvers = {
   Mutation: {
     login: async (_, { pokemon }, { req, dataSources }) => {
       const nameAndImage = await dataSources.pokemonAPI.getPokemon(pokemon);
-      req.session.user = { ...nameAndImage, lessons: [] };
+      if (!nameAndImage) throw new Error(`Failed to get pokemon: ${pokemon}`);
+      req.session.user = {
+        ...nameAndImage,
+        lessons: [],
+        ratings: lessonRatingsByUser[nameAndImage.name] || [],
+      };
       return req.session.user;
     },
     enroll: async (_, { title }, { req, dataSources }) => {
@@ -70,6 +84,36 @@ const resolvers = {
 
       // Mutate user lessons
       user.lessons.push({ title });
+
+      return user;
+    },
+    rateLesson: async (_, { title, rating }, { req, dataSources }) => {
+      // helper
+      const hasTitle = (lesson) => lesson.title === title;
+
+      // Early exit checks
+      const user = req.session.user;
+      if (!user) throw new Error('No user is logged in');
+
+      if (rating < 1 || rating > 5)
+        throw new Error(
+          `Invalid Rating: ${rating}, must be number between 1 and 5`
+        );
+
+      const validTitle = (await dataSources.lessonsAPI.getLessons()).some(
+        hasTitle
+      );
+      if (!validTitle)
+        throw new Error(`Invalid title: ${title}, must be a valid lesson`);
+
+      // Update or Add rating
+      const ratingIndex = user.ratings.findIndex(hasTitle);
+      if (ratingIndex > -1) {
+        user.ratings[ratingIndex].rating = rating;
+      } else user.ratings.push({ title, rating });
+
+      // persist ratings by pokemon in memory
+      lessonRatingsByUser[user.name] = user.ratings;
 
       return user;
     },
