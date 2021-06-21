@@ -1,15 +1,46 @@
 import React, { useEffect, useState } from 'react';
+import { gql, useLazyQuery, useMutation } from '@apollo/client';
 
 import HighlightText from '../components/HighlightText';
-import { sendQuery } from '../utilities';
 
-export default function PokemonLoginPage({ onLogin }) {
+const LOGIN = gql`
+  mutation Login($name: String!) {
+    login(pokemon: $name) {
+      name
+    }
+  }
+`;
+
+const SEARCH_POKEMON = gql`
+  query Search($filterText: String!) {
+    search(str: $filterText) {
+      name
+    }
+  }
+`;
+
+const GET_POKEMON = gql`
+  query GetPokemon($name: String!) {
+    getPokemon(str: $name) {
+      name
+      image
+    }
+  }
+`;
+
+export default function PokemonLoginPage({ loginCallback }) {
+  const [login, { data }] = useMutation(LOGIN, {
+    onCompleted: loginCallback,
+  });
+  const [search, { data: pokemon }] = useLazyQuery(SEARCH_POKEMON);
+  const [getPokemon, { data: selectedPokemon }] = useLazyQuery(GET_POKEMON);
   const [filterText, setFilterText] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-  const [selectedPokemon, setSelectedPokemon] = useState(null);
 
   const firstMount = React.useRef(true);
   const queuedSearch = React.useRef(null);
+
+  // Debounced Search
   useEffect(() => {
     // Mimic example functionality not loading full list on first load,
     // but will load full list on empty input after some search value.
@@ -20,26 +51,20 @@ export default function PokemonLoginPage({ onLogin }) {
 
     clearInterval(queuedSearch.current);
     queuedSearch.current = setTimeout(() => {
-      sendQuery(`{search(str: "${filterText}") {name}}`).then((data) => {
-        const results = data.search || [];
-        setSearchResults(
-          results.map(({ name }) => ({
-            name,
-            filterText,
-          }))
-        );
-      });
+      search({ variables: { filterText } });
     }, 300);
-  }, [filterText, setSearchResults]);
+  }, [filterText]);
 
-  const loadSelection = (name) => {
-    sendQuery(`{getPokemon(str:"${name}"){name, image}}`).then((result) => {
-      setSelectedPokemon({
-        name: result.getPokemon.name,
-        imageSrc: result.getPokemon.image,
-      });
-    });
-  };
+  // Work around to keep old data while new results are loading
+  useEffect(() => {
+    if (!pokemon) return;
+    setSearchResults(
+      pokemon.search.map(({ name }) => ({
+        name,
+        filterText,
+      }))
+    );
+  }, [pokemon, setSearchResults]);
 
   return (
     <>
@@ -55,7 +80,7 @@ export default function PokemonLoginPage({ onLogin }) {
             <h3
               key={i}
               onClick={() => {
-                loadSelection(name);
+                getPokemon({ variables: { name } });
               }}
             >
               <HighlightText highlight={filterText} text={name} />
@@ -67,11 +92,13 @@ export default function PokemonLoginPage({ onLogin }) {
       <div className="selectedSection">
         {selectedPokemon && (
           <>
-            <h1>{selectedPokemon.name}</h1>
-            <img src={selectedPokemon.imageSrc} />
+            <h1>{selectedPokemon.getPokemon.name}</h1>
+            <img src={selectedPokemon.getPokemon.image} />
             <button
               className="continue"
-              onClick={() => onLogin(selectedPokemon.name)}
+              onClick={() =>
+                login({ variables: { name: selectedPokemon.getPokemon.name } })
+              }
             >
               Login
             </button>
