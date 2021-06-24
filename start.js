@@ -1,7 +1,7 @@
 const app = require('./server/app.js');
 const { PokemonAPI } = require('./pokemon-api');
 const { LessonsAPI } = require('./lessons-api');
-
+const startSocketIoServer = require('./chat-backend');
 const port = process.env.PORT || 8123;
 
 const responseCachePlugin = require('apollo-server-plugin-response-cache');
@@ -28,8 +28,14 @@ async function startApolloServer(app) {
   return app;
 }
 
+const getApiAndEmit = (socket) => {
+  const response = new Date();
+  // Emitting a new message. Will be consumed by the client
+  socket.emit('FromAPI', response);
+};
+let interval;
 startApolloServer(app).then((app) => {
-  app.listen(port, () => {
+  startSocketIoServer(app).listen(port, () => {
     console.log(`Server is running on port ${port}`);
   });
 });

@@ -8,7 +8,5 @@
     "PROXY_PORT": 3000
   },
   "delay": 600,
-  "events": {
-    "crash": "echo \"Force Kill Server port: ${PORT:-8123}\" && sh -c 'lsof -i :${PORT:-8123} -t | xargs -r kill' && echo \"Force Kill Proxy port: ${PROXY_PORT:-3000}\" &&  sh -c 'lsof -i :${PROXY_PORT:-3000} -t | xargs -r kill' && echo \".... And try again :)\" && npm run dev"
-  }
+  "events": {}
 }
